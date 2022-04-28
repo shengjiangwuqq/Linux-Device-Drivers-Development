@@ -5,7 +5,8 @@
 
 static struct timer_list my_timer;
 
-void my_timer_callback( unsigned long data )
+/* [Shengjiang: bug 0 API update.] */
+void my_timer_callback(struct timer_list * my_timer)
 {
     pr_info( "%s called (%ld).\n", __FUNCTION__, jiffies );
 }
@@ -15,7 +16,8 @@ static int __init my_init( void )
     int retval;
     pr_info("Timer module loaded\n");
 
-    setup_timer( &my_timer, my_timer_callback, 0 );
+    /* [Shengjiang: bug 1 API update.] */
+    timer_setup( &my_timer, my_timer_callback, 0 );
     pr_info( "Setup timer to fire in 300ms (%ld)\n", jiffies );
 
     retval = mod_timer( &my_timer, jiffies + msecs_to_jiffies(300) );

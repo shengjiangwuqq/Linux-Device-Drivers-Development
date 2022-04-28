@@ -20,10 +20,20 @@ static void work_handler(struct work_struct *work)
 {
     struct work_data *my_data = container_of(work, \
                                  struct work_data, my_work); 
+    pr_info("Work queue module handler: %s, current is %p\n",
+         __FUNCTION__, current);
     pr_info("Work queue module handler: %s, data is %d\n", __FUNCTION__, my_data->the_data);
+
     msleep(3000);
+
+    /* [Shengjiang: bug 0: we need to set wake up condition here.] */
+    sleep = 1;
     wake_up_interruptible(&my_data->my_wq);
-    kfree(my_data);
+    /* 
+     * [Shengjiang: bug 1: it is not safe to free here:
+     * when sleep != 1, wait_event_interruptible will continue to access my_wq.]
+     */
+    //kfree(my_data);
 }
 
 static int __init my_init(void)
@@ -39,6 +49,8 @@ static int __init my_init(void)
     schedule_work(&my_data->my_work);
     pr_info("I'm goint to sleep ...\n");
     wait_event_interruptible(my_data->my_wq, sleep != 0);
+    /* [Shengjiang: bug 1: it is much safe to free here.*/
+    kfree(my_data);
     pr_info("I am Waked up...\n");
     return 0;
 }

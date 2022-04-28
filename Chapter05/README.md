@@ -73,3 +73,84 @@ $ dmesg
 [ 7084.861887] Nothing to read guy
 [ 7084.861906] Someone closed me
 ```
+
+## First platform driver, then platform device
+
+```
+$ sudo dmesg -C
+$ sudo insmod platform-dummy-char.ko 
+$ dmesg 
+$ sudo insmod platform-dummy-ins.ko 
+$ dmesg
+[  310.030505] platform_dummy_char_add platform_device_add pdev 00000000e5e7cb02
+[  310.030559] my_pdrv_probe pdev 00000000e5e7cb02
+[  310.030562] dummy_char major number = 236
+[  310.030600] my_pdrv_probe pdev 00000000e5e7cb02 done
+[  310.030614] platform_dummy_char_add platform_device_add pdev 00000000e5e7cb02 done
+$ sudo rmmod platform_dummy_ins 
+$ dmesg
+[  310.030505] platform_dummy_char_add platform_device_add pdev 00000000e5e7cb02
+[  310.030559] my_pdrv_probe pdev 00000000e5e7cb02
+[  310.030562] dummy_char major number = 236
+[  310.030600] my_pdrv_probe pdev 00000000e5e7cb02 done
+[  310.030614] platform_dummy_char_add platform_device_add pdev 00000000e5e7cb02 done
+[  334.791009] platform_dummy_char_put platform_device_put pdev 00000000e5e7cb02
+[  334.791012] platform_dummy_char_put platform_device_put pdev 00000000e5e7cb02 done
+[  334.791013] platform_dummy_char_put platform_device_del pdev 00000000e5e7cb02
+[  334.791027] my_pdrv_remove remove pdev 00000000e5e7cb02
+[  334.791504] my_pdrv_remove remove pdev 00000000e5e7cb02 done
+[  334.791511] platform_dummy_char_put platform_device_del pdev 00000000e5e7cb02 done
+$ sudo rmmod platform_dummy_char 
+$ dmesg
+[  310.030505] platform_dummy_char_add platform_device_add pdev 00000000e5e7cb02
+[  310.030559] my_pdrv_probe pdev 00000000e5e7cb02
+[  310.030562] dummy_char major number = 236
+[  310.030600] my_pdrv_probe pdev 00000000e5e7cb02 done
+[  310.030614] platform_dummy_char_add platform_device_add pdev 00000000e5e7cb02 done
+[  334.791009] platform_dummy_char_put platform_device_put pdev 00000000e5e7cb02
+[  334.791012] platform_dummy_char_put platform_device_put pdev 00000000e5e7cb02 done
+[  334.791013] platform_dummy_char_put platform_device_del pdev 00000000e5e7cb02
+[  334.791027] my_pdrv_remove remove pdev 00000000e5e7cb02
+[  334.791504] my_pdrv_remove remove pdev 00000000e5e7cb02 done
+[  334.791511] platform_dummy_char_put platform_device_del pdev 00000000e5e7cb02 done
+```
+
+## First platform device, then platform driver
+
+```
+$ sudo dmesg -C
+$ sudo rmmod platform_dummy_i^C 
+$ sudo insmod platform-dummy-ins.ko 
+$ dmesg
+[  835.377799] platform_dummy_char_add platform_device_add pdev 00000000a4ab44ad
+[  835.377844] platform_dummy_char_add platform_device_add pdev 00000000a4ab44ad done
+$ sudo insmod platform-dummy-char.ko 
+$ dmesg
+[  835.377799] platform_dummy_char_add platform_device_add pdev 00000000a4ab44ad
+[  835.377844] platform_dummy_char_add platform_device_add pdev 00000000a4ab44ad done
+[  848.904555] my_pdrv_probe pdev 00000000a4ab44ad
+[  848.904560] dummy_char major number = 236
+[  848.904603] my_pdrv_probe pdev 00000000a4ab44ad done
+$ sudo rmmod platform_dummy_char 
+$ dmesg
+[  835.377799] platform_dummy_char_add platform_device_add pdev 00000000a4ab44ad
+[  835.377844] platform_dummy_char_add platform_device_add pdev 00000000a4ab44ad done
+[  848.904555] my_pdrv_probe pdev 00000000a4ab44ad
+[  848.904560] dummy_char major number = 236
+[  848.904603] my_pdrv_probe pdev 00000000a4ab44ad done
+[  899.117831] my_pdrv_remove remove pdev 00000000a4ab44ad
+[  899.118688] my_pdrv_remove remove pdev 00000000a4ab44ad done
+$ sudo rmmod platform_dummy_ins 
+$ dmesg
+[  835.377799] platform_dummy_char_add platform_device_add pdev 00000000a4ab44ad
+[  835.377844] platform_dummy_char_add platform_device_add pdev 00000000a4ab44ad done
+[  848.904555] my_pdrv_probe pdev 00000000a4ab44ad
+[  848.904560] dummy_char major number = 236
+[  848.904603] my_pdrv_probe pdev 00000000a4ab44ad done
+[  899.117831] my_pdrv_remove remove pdev 00000000a4ab44ad
+[  899.118688] my_pdrv_remove remove pdev 00000000a4ab44ad done
+[  916.384091] platform_dummy_char_put platform_device_put pdev 00000000a4ab44ad
+[  916.384094] platform_dummy_char_put platform_device_put pdev 00000000a4ab44ad done
+[  916.384095] platform_dummy_char_put platform_device_del pdev 00000000a4ab44ad
+[  916.384129] platform_dummy_char_put platform_device_del pdev 00000000a4ab44ad done
+```

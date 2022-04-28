@@ -2,6 +2,7 @@
 #include <linux/module.h>
 #include <linux/workqueue.h>    /* for work queue */
 #include <linux/slab.h>         /* for kmalloc() */
+#include <linux/delay.h>
 
 struct workqueue_struct *wq;
  
@@ -13,8 +14,16 @@ struct work_data {
 static void work_handler(struct work_struct *work)
 {
     struct work_data * my_data = container_of(work, struct work_data, my_work);
+
+    /* [Shengjiang: we could sleep here.] */
+    pr_info("Work queue module handler: %s started sleep for 3 sec.\n",
+         __FUNCTION__);
+
+    msleep (3000);
+
     pr_info("Work queue module handler: %s, data is %d\n",
          __FUNCTION__, my_data->the_data);
+
     kfree(my_data);
 }
 

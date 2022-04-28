@@ -44,9 +44,11 @@ struct file_operations dummy_fops = {
 
 static int my_pdrv_probe (struct platform_device *pdev)
 {
-        struct device *dummy_device;
+    struct device *dummy_device;
     int error;
     dev_t devt = 0;
+
+    pr_info("%s pdev %p\n", __FUNCTION__, pdev);
 
     /* Get a range of minor numbers (starting with 0) to work with */
     error = alloc_chrdev_region(&devt, 0, 1, "dummy_char");
@@ -84,18 +86,20 @@ static int my_pdrv_probe (struct platform_device *pdev)
         return -1;
     }
 
-    pr_info("dummy char module loaded\n");
+    pr_info("%s pdev %p done\n", __FUNCTION__, pdev);
     return 0;
 }
 
 static int my_pdrv_remove(struct platform_device *pdev)
 {
+    pr_info("%s remove pdev %p\n",__FUNCTION__, pdev);
+
     unregister_chrdev_region(MKDEV(major, 0), 1);
     device_destroy(dummy_class, MKDEV(major, 0));
     cdev_del(&dummy_cdev);
     class_destroy(dummy_class);
 
-    pr_info("dummy char module Unloaded\n");
+    pr_info("%s remove pdev %p done\n",__FUNCTION__, pdev);
     return 0;
 }
 

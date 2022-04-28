@@ -5,16 +5,24 @@
 char tasklet_data[]="We use a string; but it could be pointer to a structure";
 
 /* Tasklet handler, that just print the data */
-void tasklet_function( unsigned long data )
+
+/* [Shengjiang: bug 0 API update. we can only use data in tasklet_struct for private data.] */
+
+void tasklet_function(struct tasklet_struct * t)
 {
-    pr_info( "%s\n", (char *)data );
+    pr_info( "%s\n", (char *)t->data );
     return;
 }
 
-DECLARE_TASKLET( my_tasklet, tasklet_function, (unsigned long) tasklet_data );
+/* [Shengjiang: bug 0 API update.] */
+
+DECLARE_TASKLET(my_tasklet, tasklet_function);
 
 static int __init my_init( void )
 {
+    /* append private data */
+    /* [Shengjiang: bug 0 API update.] */
+    my_tasklet.data = (unsigned long) &tasklet_data;
     /* Schedule the handler */
     tasklet_schedule( &my_tasklet );
     pr_info("tasklet example\n");
